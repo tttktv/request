@@ -1,0 +1,133 @@
+<!--<script src="//unpkg.com/vue@latest/dist/vue.min.js"></script>-->
+<script src="request_26839/js/vue.min.js"></script>
+
+
+
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js" integrity="sha512-hZf9Qhp3rlDJBvAKvmiG+goaaKRZA6LKUO35oK6EsM0/kjPK32Yw7URqrq3Q+Nvbbt8Usss+IekL7CRn83dYmw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>-->
+
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.3.2/chart.js" integrity="sha512-CAv0l04Voko2LIdaPmkvGjH3jLsH+pmTXKFoyh5TIimAME93KjejeP9j7wSeSRXqXForv73KUZGJMn8/P98Ifg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>-->
+
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/kineticjs/5.2.0/kinetic.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/2.1.2/jquery.scrollTo.min.js"></script>
+<script src="https://code.jquery.com/jquery-migrate-3.0.0.min.js"></script>
+
+
+
+
+<script src="/custom_web_template.html?object_code=request_26839_common&f_id=<%=Random(1,999999)%>"></script>
+
+<!-- CSS only -->
+<!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">-->
+
+
+
+<link rel="stylesheet" href="request_26839/font-awesome-4.7.0/css/font-awesome.min.css">
+
+
+<link rel="stylesheet" href="/custom_web_template.html?object_code=request_26839_css&f_id=<%=Random(1,999999)%>" />
+
+
+<div v-cloak id="App">
+
+
+	<div class="app__container" v-if="v_show==true">
+		<table class="header_table">
+		<td><img class="request_img" src="/images/request_type.png" width="96px" height="96px"></td>
+		<td><h4>Заявка</h4>
+		<h2 class=".XAML-label-header-2">Канцелярские товары</h2></td>
+		</table>
+		
+		<div style="font-weight: bold;font-size: 17px;"><p>Выберите категорию и укажите количество товара.</p></div>
+		<div v-for="(c,c_i) in categories">
+			<div class="ctg_div" v-on:click="if ($('#table'+c_i).is(':hidden')) {
+	$('#table'+c_i).show();
+	
+	off=$('#arrow'+c_i).offset().top;
+	$(window).scrollTop(off);
+	
+	$('#arrow'+c_i).removeClass('fa-caret-down');
+	$('#arrow'+c_i).addClass('fa-caret-up'); 
+	ctg_col=Object.keys(categories).length;
+	for (i=0;i<ctg_col;i++){
+		if(i!=c_i){
+			$('#table'+i).hide();$('#arrow'+i).removeClass('fa-caret-up');
+			$('#arrow'+i).addClass('fa-caret-down');
+		}
+		}
+	} 
+else {
+		$('#table'+c_i).hide();
+		$('#arrow'+c_i).removeClass('fa-caret-up');
+		$('#arrow'+c_i).addClass('fa-caret-down');
+}">
+				<div class="ctg_name_div"><p class="ctg_name">{{c.ctg}}</p></div>
+				<div class="ctg_arrow_div">
+					<i class="fa fa-caret-down" aria-hidden="true" v-bind:id="'arrow'+c_i"></i>
+				</div>
+			</div>
+			<table class="st-table" v-bind:id="'table'+c_i" style="display:none;">
+				<thead>
+					<th>Изображение</th>
+					<th>Наименование товара</th>
+					<!--<th>Описание</th>-->
+					<th>Артикул</th>
+					<th>Количество</th>
+				</thead>
+				<tbody>
+					<tr v-for="(s,s_i) in c.data">
+						<td style="text-align: center; width:230px;"><p><img :src="s.image==''? '':'/download_file.html?file_id='+s.image" alt="Нет изображения"></p></td>
+						<td style="width:720px;"><p>{{s.name}}</p></td>
+						<!--<td><p>{{s.description}}</p></td>-->
+						<td style="width:94px;"><p>{{s.code}}</p></td>
+						<td style="text-align: center; width:130px;"><p><input type="number" min="0" style="width:45px;" v-bind:id="s.id+';'+c_i" class="col_input"></p></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
+		<div style="margin: 20px 0;">
+			<button @click="$('#overlay-modal').fadeTo(100,0.6);checkOrder();$('#check_order_wdw').show();" class=".cssXPButton XAML-button XAML-button-important">Проверить заказ</button>
+			<button @click="sendOrder()" class=".cssXPButton XAML-button XAML-button-important">Отправить</button>
+		</div>
+		
+		<div id="check_order_wdw" style="display:none;" class="modal">
+			<div><p style="font-weight:bold;">Ваш заказ: </p></div>
+			<table class="st-table">
+				<thead>
+					<th>Наименование товара</th>
+					<!--<th>Описание</th>-->
+					<th>Артикул</th>
+					<th>Количество</th>
+				</thead>
+				<tbody>
+					<tr v-for="(it,it_i) in selected_items">
+						<td><p>{{it.name}}</p></td>
+						<!--<td><p>{{it.description}}</p></td>-->
+						<td><p>{{it.code}}</p></td>
+						<td><p>{{it.col}}</p></td>
+					</tr>
+				</tbody>
+			</table>
+			<div style="margin: 20px 0 0 0;text-align: center;">
+				<button onclick="$('#overlay-modal').hide();$('#check_order_wdw').hide();" class=".cssXPButton XAML-button XAML-button-important">Вернуться к заказу</button>
+			</div>
+		</div>
+		
+		<div class="overlay" id="overlay-modal" onclick="$('#overlay-modal').hide();$('#check_order_wdw').hide();"></div>
+		
+	</div>
+
+</div>
+
+
+<script>
+    GLOBAL = {};
+    GLOBAL.curUserID = "<%=curUserID%>"
+	GLOBAL.BACKEND_TEMPLATE_CODE = "request_26839_backend";
+
+</script>
+
+<script src="/custom_web_template.html?object_code=request_26839_js"></script>
